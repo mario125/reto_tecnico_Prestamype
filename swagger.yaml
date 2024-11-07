@@ -1,0 +1,234 @@
+openapi: 3.0.0
+info:
+  title: Reto Técnico API
+  description: Documentación completa de la API para el reto técnico.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Servidor de desarrollo
+paths:
+  /auth/token:
+    post:
+      summary: Solicitar un token de un solo uso para operaciones específicas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operation:
+                  type: string
+                  enum: [login, register]
+                  example: login
+      responses:
+        "200":
+          description: Token generado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+
+  /auth/register:
+    post:
+      summary: Registrar un nuevo usuario.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: mario@gmail.com
+                password:
+                  type: string
+                  example: Mmario125@
+      responses:
+        "201":
+          description: Usuario registrado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+        "400":
+          description: Error de validación o token no válido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión de usuario.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: mario@gmail.com
+                password:
+                  type: string
+                  example: Mmario125@
+      responses:
+        "200":
+          description: Login exitoso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+        "401":
+          description: Credenciales inválidas.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+
+  /api/cambio:
+    post:
+      summary: Crear una solicitud de cambio.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tipo_de_cambio:
+                  type: string
+                  enum: [compra, venta]
+                  example: venta
+                monto_enviar:
+                  type: number
+                  example: 50
+      responses:
+        "201":
+          description: Solicitud de cambio creada.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        "400":
+          description: Error al crear la solicitud.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+                  status:
+                    type: boolean
+
+    get:
+      summary: Listar solicitudes de cambio.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Lista de solicitudes de cambio.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  status:
+                    type: boolean
+
+  /api/cambio/{id}:
+    delete:
+      summary: Eliminar una solicitud de cambio específica.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID de la solicitud de cambio.
+      responses:
+        "200":
+          description: Solicitud eliminada exitosamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+        "404":
+          description: Solicitud no encontrada o no autorizada.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,25 @@
+version: "3"
+services:
+  web:
+    container_name: api_rest
+    restart: always
+    build: .
+    ports:
+      - "5000:3000"
+    links:
+      - "mongo"
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - .env
+    command: npm run dev
+
+  mongo:
+    container_name: mymongodatabase
+    image: mongo
+    ports:
+      - "27018:27017"
+    logging:
+      driver: "none"
+    tty: false
+    command: ["mongod", "--quiet"]
